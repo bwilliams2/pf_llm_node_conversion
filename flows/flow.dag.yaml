@@ -1,0 +1,63 @@
+environment:
+  python_requirements_txt: requirements.txt
+additional_includes:
+  - prompts/extraction.jinja2 # place in higher level package with other reusable prompts
+inputs:
+    chat_history:
+      type: list 
+      default: 
+      - role: user
+        content: The party is for 10 people.
+outputs:
+  llm_extraction:
+    type: object
+    reference: ${llm_node.output}
+  code_extraction:
+    type: object 
+    reference: ${code_node.output}
+nodes:
+- name: llm_node
+  type: llm
+  source:
+    type: code
+    path: ./prompts/extraction.jinja2
+  inputs:
+    chat_history: ${inputs.chat_history}
+    deployment_name: gpt-4-1106
+    max_tokens: 250
+    temperature: 0
+    function_call: auto
+    functions:
+    - name: update_number_of_people
+      description: Used to update number of people from user
+      parameters:
+        type: object
+        properties:
+          numPeople:
+            type: integer
+            description: number_of_people
+  connection: open_ai_connection
+  api: chat
+- name: code_node
+  type: python
+  source:
+    type: code
+    path: ./src/extraction.py
+  inputs:
+    chat_history: ${inputs.chat_history}
+    prompt_template: prompts/extraction.jinja2
+    deployment_name: gpt-4-1106
+    max_tokens: 250
+    temperature: 0
+    function_call: auto
+    functions:
+    - name: update_number_of_people
+      description: Used to update number of people from user
+      parameters:
+        type: object
+        properties:
+          numPeople:
+            type: integer
+            description: number_of_people
+    ptu_connection: open_ai_connection
+    paygo_connection: open_ai_connection

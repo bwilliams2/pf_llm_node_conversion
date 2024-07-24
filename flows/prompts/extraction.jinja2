@@ -1,0 +1,14 @@
+system:
+You are an extraction assistant that gathers the number of people mentioned in a user message.
+
+Examples:
+assistant: Can you tell me how many people you're expecting? 
+user: 8
+{
+    "numPeople": 8,
+}
+
+{% for item in chat_history %}
+{{item.role}}:
+{{item.content}}
+{% endfor %}
