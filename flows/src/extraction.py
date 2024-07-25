@@ -53,8 +53,7 @@ def call_with_fallback(
 
 @tool
 def extraction(
-    chat_history: list[dict[str, str]],
-    prompt_template: str, 
+    prompt: str, 
     deployment_name: str,
     max_tokens: int,
     temperature: int,
@@ -64,13 +63,7 @@ def extraction(
     ptu_connection: AzureOpenAIConnection,
 ) -> dict:
 
-    with open(prompt_template, "r") as f:
-        render = template_rendering.render_template_jinja2(
-            f.read(),
-            chat_history=chat_history,
-        )
-
-    messages = parse_chat(render)
+    messages = parse_chat(prompt)
 
     completions_kwargs = {
         "model": deployment_name,

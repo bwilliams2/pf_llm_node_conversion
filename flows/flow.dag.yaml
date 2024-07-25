@@ -38,14 +38,20 @@ nodes:
             description: number_of_people
   connection: open_ai_connection
   api: chat
+- name: code_node_prompt
+  type: prompt 
+  source:
+    type: code
+    path: ./prompts/extraction.jinja2
+  inputs:
+    chat_history: ${inputs.chat_history}
 - name: code_node
   type: python
   source:
     type: code
     path: ./src/extraction.py
   inputs:
-    chat_history: ${inputs.chat_history}
-    prompt_template: prompts/extraction.jinja2
+    prompt: ${code_node_prompt.output}
     deployment_name: gpt-4-1106
     max_tokens: 250
     temperature: 0
